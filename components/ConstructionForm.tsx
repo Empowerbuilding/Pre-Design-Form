@@ -891,7 +891,7 @@ const ConstructionForm = () => {
           <div className="flex flex-col items-center">
             <div className="relative h-12 w-40 sm:h-16 sm:w-48">
               <Image
-                src="/Logo.PNG"
+                src="https://hbfjdfxephlczkfgpceg.supabase.co/storage/v1/object/public/website/logos/logo1.png"
                 alt="Barnhaus Steel Builders Logo"
                 fill
                 priority
@@ -900,7 +900,7 @@ const ConstructionForm = () => {
             </div>
             <div className="text-center mt-4">
               <CardTitle className="text-2xl sm:text-3xl">Pre-Design Form</CardTitle>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-gray-700">
                 Help us understand your construction needs
               </p>
             </div>
