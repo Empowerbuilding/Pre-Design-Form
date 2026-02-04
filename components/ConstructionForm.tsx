@@ -887,7 +887,7 @@ const ConstructionForm = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Card className="mx-auto border-none rounded-none sm:rounded-lg sm:my-4 sm:mx-4 shadow-none sm:shadow-sm">
-        <CardHeader className="border-b space-y-4 px-4 py-6 sm:px-6 bg-gray-100">
+        <CardHeader className="border-b space-y-4 px-4 py-6 sm:px-6 bg-black">
           <div className="flex flex-col items-center">
             <div className="relative h-12 w-40 sm:h-16 sm:w-48">
               <Image
@@ -899,8 +899,8 @@ const ConstructionForm = () => {
               />
             </div>
             <div className="text-center mt-4">
-              <CardTitle className="text-2xl sm:text-3xl">Pre-Design Form</CardTitle>
-              <p className="mt-2 text-sm text-gray-700">
+              <CardTitle className="text-2xl sm:text-3xl text-white">Pre-Design Form</CardTitle>
+              <p className="mt-2 text-sm text-gray-300">
                 Help us understand your construction needs
               </p>
             </div>
@@ -917,9 +917,9 @@ const ConstructionForm = () => {
                   }}
                   className={`
                     flex-none px-3 py-1.5 text-sm rounded-full whitespace-nowrap
-                    ${currentStep === index + 1 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-gray-100 text-gray-600'
+                    ${currentStep === index + 1
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-800 text-gray-300'
                     }
                   `}
                 >
@@ -927,7 +927,7 @@ const ConstructionForm = () => {
                 </button>
               ))}
             </div>
-            <div className="mt-4 h-1.5 bg-gray-100 rounded-full">
+            <div className="mt-4 h-1.5 bg-gray-700 rounded-full">
               <div 
                 className="h-full bg-blue-500 rounded-full transition-all duration-300"
                 style={{ width: `${(currentStep / 5) * 100}%` }}
