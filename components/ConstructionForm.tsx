@@ -887,7 +887,7 @@ const ConstructionForm = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Card className="mx-auto border-none rounded-none sm:rounded-lg sm:my-4 sm:mx-4 shadow-none sm:shadow-sm">
-        <CardHeader className="border-b space-y-4 px-4 py-6 sm:px-6">
+        <CardHeader className="border-b space-y-4 px-4 py-6 sm:px-6 bg-gray-100">
           <div className="flex flex-col items-center">
             <div className="relative h-12 w-40 sm:h-16 sm:w-48">
               <Image
