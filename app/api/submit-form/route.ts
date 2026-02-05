@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 interface FormDataObject {
   name: string;
@@ -149,14 +149,23 @@ function getClientIp(request: Request): string {
 
 // ─── Supabase ────────────────────────────────────────────────────────────────
 
-const supabaseUrl = process.env.SUPABASE_URL as string;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _supabase: SupabaseClient<any, 'public', any> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL as string;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 async function uploadFileToSupabase(file: File, fileName: string) {
   const buffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(buffer);
 
+  const supabase = getSupabase();
   const { data, error } = await supabase.storage
     .from('inspiration-images')
     .upload(fileName, uint8Array, {
@@ -169,7 +178,7 @@ async function uploadFileToSupabase(file: File, fileName: string) {
     throw error;
   }
 
-  const { data: urlData } = supabase.storage
+  const { data: urlData } = getSupabase().storage
     .from('inspiration-images')
     .getPublicUrl(fileName);
 
@@ -328,7 +337,7 @@ export async function POST(request: Request) {
     }
 
     // ── 6. Save to database ───────────────────────────────────────────────
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('construction_submissions')
       .insert([
         {
