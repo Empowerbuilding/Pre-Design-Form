@@ -115,6 +115,8 @@ interface FormData {
   phone: string;
   constructionBudget: string;
   propertyAddress: string;
+  propertyCity: string;
+  propertyZip: string;
   hasSurvey: string;
   hasSlope: string;
   padDirection: string;
@@ -157,6 +159,8 @@ const ConstructionForm = () => {
     phone: '',
     constructionBudget: '',
     propertyAddress: '',
+    propertyCity: '',
+    propertyZip: '',
     hasSurvey: 'yes',
     hasSlope: 'yes',
     padDirection: '',
@@ -338,6 +342,8 @@ const ConstructionForm = () => {
         phone: '',
         constructionBudget: '',
         propertyAddress: '',
+        propertyCity: '',
+        propertyZip: '',
         hasSurvey: 'yes',
         hasSlope: 'yes',
         padDirection: '',
@@ -480,6 +486,24 @@ const ConstructionForm = () => {
         <TextInput
           name="propertyAddress"
           value={formData.propertyAddress}
+          onChange={handleInputChange}
+          placeholder="Type here..."
+        />
+      </FormField>
+
+      <FormField label="City">
+        <TextInput
+          name="propertyCity"
+          value={formData.propertyCity}
+          onChange={handleInputChange}
+          placeholder="Type here..."
+        />
+      </FormField>
+
+      <FormField label="Zip Code">
+        <TextInput
+          name="propertyZip"
+          value={formData.propertyZip}
           onChange={handleInputChange}
           placeholder="Type here..."
         />

@@ -7,6 +7,8 @@ interface FormDataObject {
   phone: string;
   constructionBudget: string | number;
   propertyAddress: string;
+  propertyCity: string;
+  propertyZip: string;
   hasSurvey: string;
   hasSlope: string;
   padDirection: string;
@@ -346,6 +348,8 @@ export async function POST(request: Request) {
           phone: formDataObj.phone,
           construction_budget: formDataObj.constructionBudget.toString(),
           property_address: formDataObj.propertyAddress,
+          property_city: formDataObj.propertyCity,
+          property_zip: formDataObj.propertyZip,
           has_survey: formDataObj.hasSurvey,
           has_slope: formDataObj.hasSlope,
           pad_direction: formDataObj.padDirection,
