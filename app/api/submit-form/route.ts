@@ -405,24 +405,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // ── 7. Notify the team via n8n ("Pre Design Form to Google Drive"
-    // workflow: saves a copy to Drive + emails the team). The workflow expects
-    // the same payload shape a Supabase DB webhook would send: { record: <row> }.
-    // Fire-and-forget: a slow notification must not delay the submit response.
-    if (data[0]) {
-      void fetch(
-        process.env.N8N_PREDESIGN_WEBHOOK_URL ??
-          'https://n8n.empowerbuilding.ai/webhook/0b92b989-5bee-403c-9ec8-52ddccf331cc',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ record: data[0] }),
-        }
-      ).catch((notifyError) => {
-        console.error('Team notification webhook failed:', notifyError);
-      });
-    }
-
     return NextResponse.json({
       success: true,
       message: 'Form submitted successfully! Your submission has been saved.',
