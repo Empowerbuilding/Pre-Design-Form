@@ -209,7 +209,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (parseError) {
+      // Most common cause: request body exceeded the size limit and was
+      // truncated, making FormData parsing impossible.
+      logRejection(ip, 'Request body parse failed (likely oversized)', { error: String(parseError) });
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Your upload was too large to process. Please use fewer or smaller images (5MB max each) and try again.'
+        },
+        { status: 413 }
+      );
+    }
 
     // ── 2. Honeypot check ─────────────────────────────────────────────────
     const honeypot = formData.get('_website');

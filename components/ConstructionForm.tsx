@@ -9,6 +9,56 @@ import { FormField, TextInput, RadioGroup, CheckboxGroup } from './FormComponent
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const COMPRESS_MAX_DIMENSION = 2000;
+const COMPRESS_JPEG_QUALITY = 0.85;
+
+// Downscale + re-encode large images in the browser so multi-image submissions
+// stay well under the server's request body limit. Falls back to the original
+// file on any error, for GIFs (canvas would kill animation), or when
+// compression doesn't actually help.
+async function compressImage(file: File): Promise<File> {
+  if (file.type === 'image/gif' || file.size < 1024 * 1024) return file;
+
+  return new Promise<File>((resolve) => {
+    const img = new window.Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, COMPRESS_MAX_DIMENSION / Math.max(img.width, img.height));
+      URL.revokeObjectURL(url);
+      if (scale === 1 && file.size < 2 * 1024 * 1024) {
+        resolve(file);
+        return;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob || blob.size >= file.size) {
+            resolve(file);
+            return;
+          }
+          resolve(
+            new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
+          );
+        },
+        'image/jpeg',
+        COMPRESS_JPEG_QUALITY
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+}
 
 interface ImageUploadProps {
   onImagesChange: (images: File[]) => void;
@@ -18,7 +68,7 @@ interface ImageUploadProps {
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesChange, maxImages = 5 }) => {
   const [previewUrls, setPreviewUrls] = useState<{ file: File; url: string }[]>([]);
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (previewUrls.length + files.length > maxImages) {
       alert(`You can only upload up to ${maxImages} images`);
@@ -46,13 +96,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesChange, maxImages = 5
 
     if (accepted.length === 0) return;
 
-    const newPreviews = accepted.map(file => ({
+    // Compress before adding so previews match what will actually be submitted
+    const compressed: File[] = [];
+    for (const file of accepted) {
+      compressed.push(await compressImage(file));
+    }
+
+    const newPreviews = compressed.map(file => ({
       file,
       url: URL.createObjectURL(file)
     }));
 
     setPreviewUrls(prev => [...prev, ...newPreviews]);
-    onImagesChange([...previewUrls.map(p => p.file), ...accepted]);
+    onImagesChange([...previewUrls.map(p => p.file), ...compressed]);
   }, [maxImages, onImagesChange, previewUrls]);
 
   const removeImage = useCallback((indexToRemove: number) => {
@@ -102,7 +158,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesChange, maxImages = 5
         )}
       </div>
       <p className="text-sm text-gray-500">
-        Upload up to {maxImages} images of your inspiration or specific details you'd like to include
+        Upload up to {maxImages} images of your inspiration or specific details you'd like to include (large images are resized automatically)
       </p>
     </div>
   );
